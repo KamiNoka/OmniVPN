@@ -26,7 +26,6 @@ targets:
       - target: PacketTunnel
       - framework: Frameworks/Libbox.xcframework
         embed: true
-      - sdk: UIKit.framework
       - sdk: NetworkExtension.framework
       - sdk: SystemConfiguration.framework
     info:
@@ -62,7 +61,6 @@ targets:
     dependencies:
       - framework: Frameworks/Libbox.xcframework
         embed: false
-      - sdk: UIKit.framework
       - sdk: NetworkExtension.framework
       - sdk: SystemConfiguration.framework
     info:
@@ -78,16 +76,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.universal.vpnclient.PacketTunnel
         ENABLE_BITCODE: "NO"
-        APPLICATION_EXTENSION_API_ONLY: "NO"
+        APPLICATION_EXTENSION_API_ONLY: "YES"
         CODE_SIGNING_ALLOWED: "NO"
         CODE_SIGNING_REQUIRED: "NO"
         CODE_SIGN_IDENTITY: ""
         SWIFT_OPTIMIZATION_LEVEL: "-O"
         OTHER_LDFLAGS:
-          - "-framework"
-          - "UIKit"
-          - "-framework"
-          - "NetworkExtension"
-          - "-framework"
-          - "SystemConfiguration"
           - "-lc++"
