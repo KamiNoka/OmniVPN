@@ -72,7 +72,8 @@ public class SubscriptionParser {
     // MARK: - VLESS
     // Example: vless://uuid@host:port?security=reality&sni=example.com&pbk=xxx&sid=yyy&type=grpc&serviceName=zzz#Tag
     private func parseVLESS(_ url: URL) -> ServerNode? {
-        guard let host = url.host, let port = url.port ?? (url.scheme == "vless" ? 443 : nil) else { return nil }
+        guard let host = url.host else { return nil }
+        let port = url.port ?? 443
         let uuid = url.user ?? ""
         let fragment = url.fragment?.removingPercentEncoding ?? "VLESS-\(host)"
 
@@ -113,7 +114,8 @@ public class SubscriptionParser {
     // MARK: - Hysteria 2
     // Example: hysteria2://password@host:port?sni=example.com&obfs=password#Tag
     private func parseHysteria2(_ url: URL) -> ServerNode? {
-        guard let host = url.host, let port = url.port ?? 443 else { return nil }
+        guard let host = url.host else { return nil }
+        let port = url.port ?? 443
         let password = url.user ?? ""
         let fragment = url.fragment?.removingPercentEncoding ?? "Hy2-\(host)"
 
@@ -143,7 +145,8 @@ public class SubscriptionParser {
 
     // MARK: - Trojan
     private func parseTrojan(_ url: URL) -> ServerNode? {
-        guard let host = url.host, let port = url.port ?? 443 else { return nil }
+        guard let host = url.host else { return nil }
+        let port = url.port ?? 443
         let password = url.user ?? ""
         let fragment = url.fragment?.removingPercentEncoding ?? "Trojan-\(host)"
 
@@ -172,7 +175,8 @@ public class SubscriptionParser {
     // MARK: - Shadowsocks (SIP002)
     // ss://BASE64(method:password)@host:port#Tag
     private func parseShadowsocks(_ url: URL, raw: String) -> ServerNode? {
-        guard let host = url.host, let port = url.port else { return nil }
+        guard let host = url.host else { return nil }
+        let port = url.port ?? 8388
         let fragment = url.fragment?.removingPercentEncoding ?? "SS-\(host)"
 
         var method = "chacha20-ietf-poly1305"
@@ -236,7 +240,8 @@ public class SubscriptionParser {
 
     // MARK: - TUIC
     private func parseTUIC(_ url: URL) -> ServerNode? {
-        guard let host = url.host, let port = url.port ?? 443 else { return nil }
+        guard let host = url.host else { return nil }
+        let port = url.port ?? 443
         let token = url.user ?? ""
         let fragment = url.fragment?.removingPercentEncoding ?? "TUIC-\(host)"
 

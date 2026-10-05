@@ -39,8 +39,9 @@ public class VPNManager: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            guard let self = self else { return }
-            self.updateVPNStatus()
+            Task { @MainActor [weak self] in
+                self?.updateVPNStatus()
+            }
         }
     }
 
