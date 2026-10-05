@@ -12,7 +12,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     private var mockDownloadBytes: Int64 = 0
 
     #if canImport(Libbox)
-    private var boxService: LibboxBoxService?
     private var commandServer: LibboxCommandServer?
     #endif
 
@@ -82,12 +81,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         self.commandServer = LibboxNewCommandServer(handler, platform, &error)
 
         let overrideOptions = LibboxOverrideOptions()
-        var startError: NSError?
-        self.commandServer?.startOrReloadService(configJSON, options: overrideOptions, error: &startError)
-        if let startError = startError {
-            logMessage("Ошибка запуска сервиса Sing-box: \(startError.localizedDescription)")
-        } else {
+        do {
+            try self.commandServer?.startOrReloadService(configJSON, options: overrideOptions)
             logMessage("Ядро Sing-box успешно запущено")
+        } catch {
+            logMessage("Ошибка запуска сервиса Sing-box: \(error.localizedDescription)")
         }
         #else
         logMessage("Ядро Sing-box (Libbox.xcframework) слинковано в режиме интерфейса")
@@ -101,8 +99,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         statsTimer = nil
 
         #if canImport(Libbox)
-        var error: NSError?
-        commandServer?.closeService(&error)
+        try? commandServer?.closeService()
         commandServer?.close()
         commandServer = nil
         #endif
