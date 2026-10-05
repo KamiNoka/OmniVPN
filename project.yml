@@ -3,15 +3,16 @@ options:
   bundleIdPrefix: com.universal.vpnclient
   deploymentTarget:
     iOS: "16.0"
-  xcodeVersion: "15.0"
   generateEmptyDirectories: true
 
 settings:
   base:
     SWIFT_VERSION: "5.9"
     IPHONEOS_DEPLOYMENT_TARGET: "16.0"
-    DEVELOPMENT_TEAM: "${DEVELOPMENT_TEAM}"
-    CODE_SIGN_STYLE: "Automatic"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGN_IDENTITY: ""
+    DEVELOPMENT_TEAM: ""
 
 targets:
   VpnClient:
@@ -42,6 +43,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.universal.vpnclient
         ENABLE_BITCODE: "NO"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGN_IDENTITY: ""
         SWIFT_OPTIMIZATION_LEVEL: "-O"
 
   PacketTunnel:
@@ -69,4 +73,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.universal.vpnclient.PacketTunnel
         ENABLE_BITCODE: "NO"
         APPLICATION_EXTENSION_API_ONLY: "YES"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGN_IDENTITY: ""
         SWIFT_OPTIMIZATION_LEVEL: "-O"
