@@ -1,0 +1,72 @@
+name: VpnClient
+options:
+  bundleIdPrefix: com.universal.vpnclient
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    DEVELOPMENT_TEAM: "${DEVELOPMENT_TEAM}"
+    CODE_SIGN_STYLE: "Automatic"
+
+targets:
+  VpnClient:
+    type: application
+    platform: iOS
+    sources:
+      - path: VpnClient
+    entitlements:
+      path: VpnClient/VpnClient.entitlements
+    dependencies:
+      - target: PacketTunnel
+      - framework: Frameworks/Libbox.xcframework
+        embed: true
+    info:
+      path: VpnClient/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: "OmniVPN"
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        UILaunchStoryboardName: "LaunchScreen"
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSCameraUsageDescription: "Необходим доступ к камере для сканирования QR-кодов подписок и серверов."
+        NSLocalNetworkUsageDescription: "Необходим доступ к локальной сети для проверки пинга серверов и раздельного туннелирования."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.universal.vpnclient
+        ENABLE_BITCODE: "NO"
+        SWIFT_OPTIMIZATION_LEVEL: "-O"
+
+  PacketTunnel:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PacketTunnel
+      - path: VpnClient/Models
+    entitlements:
+      path: PacketTunnel/PacketTunnel.entitlements
+    dependencies:
+      - framework: Frameworks/Libbox.xcframework
+        embed: false
+    info:
+      path: PacketTunnel/Info.plist
+      properties:
+        CFBundleDisplayName: "PacketTunnel"
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: "com.apple.networkextension.packet-tunnel"
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).PacketTunnelProvider"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.universal.vpnclient.PacketTunnel
+        ENABLE_BITCODE: "NO"
+        APPLICATION_EXTENSION_API_ONLY: "YES"
+        SWIFT_OPTIMIZATION_LEVEL: "-O"

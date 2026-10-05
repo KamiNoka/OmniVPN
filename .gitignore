@@ -1,0 +1,20 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata
+*.xcodeproj/xcuserdata
+xcuserdata/
+
+# IPA & Archives
+*.ipa
+*.xcarchive
+*.dSYM.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
