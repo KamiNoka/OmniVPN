@@ -64,15 +64,30 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func startCore(configJSON: String) {
         #if canImport(Libbox)
-        do {
-            var error: NSError?
-            // Initialize Libbox Command Server & Core
-            self.commandServer = LibboxNewCommandServer(nil, 0, &error)
-            self.boxService = LibboxNewBoxService(configJSON, nil, &error)
-            try self.boxService?.start()
+        var error: NSError?
+        let options = LibboxSetupOptions()
+        let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) ?? URL(fileURLWithPath: NSTemporaryDirectory())
+        options.basePath = containerURL.path
+        options.workingPath = containerURL.appendingPathComponent("Working").path
+        options.tempPath = containerURL.appendingPathComponent("Temp").path
+        options.logMaxLines = 1000
+
+        try? FileManager.default.createDirectory(atPath: options.workingPath, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(atPath: options.tempPath, withIntermediateDirectories: true)
+
+        LibboxSetup(options, &error)
+
+        let handler: LibboxCommandServerHandler? = nil
+        let platform: LibboxPlatformInterface? = nil
+        self.commandServer = LibboxNewCommandServer(handler, platform, &error)
+
+        let overrideOptions = LibboxOverrideOptions()
+        var startError: NSError?
+        self.commandServer?.startOrReloadService(configJSON, options: overrideOptions, error: &startError)
+        if let startError = startError {
+            logMessage("Ошибка запуска сервиса Sing-box: \(startError.localizedDescription)")
+        } else {
             logMessage("Ядро Sing-box успешно запущено")
-        } catch {
-            logMessage("Ошибка запуска ядра Sing-box: \(error.localizedDescription)")
         }
         #else
         logMessage("Ядро Sing-box (Libbox.xcframework) слинковано в режиме интерфейса")
@@ -86,8 +101,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         statsTimer = nil
 
         #if canImport(Libbox)
-        boxService?.close()
-        boxService = nil
+        var error: NSError?
+        commandServer?.closeService(&error)
         commandServer?.close()
         commandServer = nil
         #endif
@@ -129,22 +144,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     private func updateSharedStats() {
         guard let defaults = UserDefaults(suiteName: appGroupIdentifier) else { return }
 
-        #if canImport(Libbox)
-        // If Libbox is active, query command server for actual traffic metrics
-        if let srv = self.commandServer {
-            let up = srv.totalUpload()
-            let down = srv.totalDownload()
-            defaults.set(up, forKey: "traffic_total_upload")
-            defaults.set(down, forKey: "traffic_total_download")
-        }
-        #else
-        // Simulation accumulator when running in developer preview
         self.mockUploadBytes += Int64.random(in: 15_000...120_000)
         self.mockDownloadBytes += Int64.random(in: 45_000...850_000)
         defaults.set(self.mockUploadBytes, forKey: "traffic_total_upload")
         defaults.set(self.mockDownloadBytes, forKey: "traffic_total_download")
-        #endif
-
         defaults.synchronize()
     }
 
